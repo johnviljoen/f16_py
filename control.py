@@ -240,7 +240,7 @@ class LMPC(nn.Module):
     def OSQP_setup(self, y, yr):
         """
         y represents the current state vector seen by the MPC
-
+        
         yr represents the reference state vector that the MPC wishes to achieve
         """
 

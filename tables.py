@@ -19,6 +19,7 @@ import numpy as np
 import sys
 
 aerodata_path = "/home/jovi/Documents/Code/f16_pt2/aerodata"
+aerodata_path = "/home/jovi/Documents/Code/f16_pt2/aerodata_exp"
 
 dtype = torch.double
 tables = ctypes.CDLL(aerodata_path + "/hifi_F16_AeroData.so")
