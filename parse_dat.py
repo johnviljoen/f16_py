@@ -72,7 +72,7 @@ class Py_lookup():
          
             # 2D tables
             elif len(dims) == 2:
-                self.tables[file] = torch.tensor(self.read_file(f"aerodata/{file}")).reshape([dims[0],dims[1]])
+                self.tables[file] = torch.tensor(np.array(self.read_file(f"aerodata/{file}")).reshape([dims[0],dims[1]],order='F'))
                 self.points[file] = (
                     self.axes[self.ndinfo[file]['alpha_fi']], 
                     self.axes[self.ndinfo[file]['beta_fi']])

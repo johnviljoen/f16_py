@@ -239,6 +239,7 @@ double interpn(double **X,double *Y,double *x,ND_INFO ndinfo){
 		T[i] = Y[index];
 		}
 	result = linearInterpolate(T,x,xPoint,ndinfo);
+	printf("Double value is %lf \n", indexMatrix);
 	free(indexVector);
 	free(T);
 	freeIntMat(indexMatrix,nDimension,2);
