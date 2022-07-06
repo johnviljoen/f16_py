@@ -129,7 +129,7 @@ f16 = F16(device, dtype)
 f16.lmpc.dlqr()
 
 # testing the CLP simulation of the dlqr K matrix on the linearised system
-ts = 10000
+ts = 1000
 out = torch.zeros([12,ts])
 rp = 0.
 rq = 2. 
@@ -212,7 +212,9 @@ for i in range(18):
     axs[i].plot(t, out[i,:])
     axs[i].set(ylabel=f'{states[i]}')
 fig.suptitle(f'nonlinear system closed loop with LMPC controller \n p_cmd={rp}, q_cmd={rq}, r_cmd={rr}')
-plt.show()
+#plt.show()
+
+plt.savefig('test.png')
 
 import pdb
 pdb.set_trace()
