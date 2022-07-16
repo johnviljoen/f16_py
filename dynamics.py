@@ -50,7 +50,6 @@ class Nlplant(nn.Module):
         xdot[12:18] = actuator_xdot
         return xdot, accelerations, atmospherics
 
-
 class Atmos(nn.Module):
     def __init__(self, device, dtype):
         super().__init__()
@@ -122,7 +121,6 @@ class Actuators(nn.Module):
         rud_cmd = torch.clip(rud_cmd,u_lb[3],u_ub[3])
         # rate saturation
         return torch.clip(20.2*(rud_cmd - rud_state), -120, 120)
-
 
 class EoM(nn.Module):
     def __init__(self, device, dtype, lookup_type='C'):

@@ -3,7 +3,7 @@ import torch
 import matplotlib.pyplot as plt
 #from parse_dat import py_lookup
 from tqdm import tqdm
-from tables import c_lookup, py_parse, py_tables
+from tables import c_lookup, py_parse, py_lookup
 
 # one inference example
 alpha = np.array([0.])
@@ -117,7 +117,7 @@ c2f = { 'Cx':'CX0120_ALPHA1_BETA1_DH1_201.dat',         # hifi_C
 f2c = {value: key for key, value in c2f.items()}
 
 ########## testing py_tables
-Cx, Cz, Cm, Cy, Cn, Cl = py_tables.hifi_C()
+Cx, Cz, Cm, Cy, Cn, Cl = py_lookup.hifi_C()
 
 import pdb
 pdb.set_trace()

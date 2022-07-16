@@ -414,30 +414,51 @@ class Py_lookup():
         z0 = dh_table[z0_idx]
         z1 = dh_table[z1_idx]
 
+        # differences in x y z from desired positions 
+        xd = (x - x0)/(x1 - x0)
+        yd = (y - y0)/(y1 - y0)
+        zd = (z - z0)/(z1 - z0)
+
         # at the base dh level
-        Q000 = self.parse.tables[c2f[coeff]][x0_idx, y0_idx, z0_idx].to(torch.float32)
-        Q010 = self.parse.tables[c2f[coeff]][x0_idx, y1_idx, z0_idx].to(torch.float32)
-        Q100 = self.parse.tables[c2f[coeff]][x1_idx, y0_idx, z0_idx].to(torch.float32)
-        Q110 = self.parse.tables[c2f[coeff]][x1_idx, y1_idx, z0_idx].to(torch.float32)
+        C000 = self.parse.tables[c2f[coeff]][x0_idx, y0_idx, z0_idx].to(torch.float32)
+        C010 = self.parse.tables[c2f[coeff]][x0_idx, y1_idx, z0_idx].to(torch.float32)
+        C100 = self.parse.tables[c2f[coeff]][x1_idx, y0_idx, z0_idx].to(torch.float32)
+        C110 = self.parse.tables[c2f[coeff]][x1_idx, y1_idx, z0_idx].to(torch.float32)
        
         # at the top dh level
-        Q001 = self.parse.tables[c2f[coeff]][x0_idx, y0_idx, z1_idx].to(torch.float32)
-        Q011 = self.parse.tables[c2f[coeff]][x0_idx, y1_idx, z1_idx].to(torch.float32)
-        Q101 = self.parse.tables[c2f[coeff]][x1_idx, y0_idx, z1_idx].to(torch.float32)
-        Q111 = self.parse.tables[c2f[coeff]][x1_idx, y1_idx, z1_idx].to(torch.float32)
+        C001 = self.parse.tables[c2f[coeff]][x0_idx, y0_idx, z1_idx].to(torch.float32)
+        C011 = self.parse.tables[c2f[coeff]][x0_idx, y1_idx, z1_idx].to(torch.float32)
+        C101 = self.parse.tables[c2f[coeff]][x1_idx, y0_idx, z1_idx].to(torch.float32)
+        C111 = self.parse.tables[c2f[coeff]][x1_idx, y1_idx, z1_idx].to(torch.float32)
 
-        
-        
-        
+        # 
+        C00 = C000 * (1 - xd) + C100 * xd
+        C01 = C001 * (1 - xd) + C101 * xd
+        C10 = C010 * (1 - xd) + C110 * xd
+        C11 = C011 * (1 - xd) + C111 * xd
+
+        #
+        C0 = C00 * (1 - yd) + C10 * yd
+        C1 = C01 * (1 - yd) + C11 * yd
+
+        # 
+        C = C0 * (1 - zd) + C1 * zd
+
+
+        return C 
 
 py_lookup = Py_lookup()
-py_lookup.get_bounds_3d(torch.tensor([0.,0.1,0.1]), 'Cx')
 
-py_lookup.get_bounds_2d(torch.tensor([0.,0.1]), 'Cx_lef')
-py_lookup.get_bounds_1d(torch.tensor([0.]), 'CXq')
 
-CXq = py_lookup.interp_1d(torch.tensor([0.]), 'CXq')
-Cx_lef = py_lookup.interp_2d(torch.tensor([0.,0.]), 'Cx_lef')
+if __name__ == "__main__":
+    py_lookup.get_bounds_3d(torch.tensor([0.,0.1,0.1]), 'Cx')
 
-# Cx = py_lookup.interp_3d(torch.tensor([0.,0.,0.]), 'Cx')
+    py_lookup.get_bounds_2d(torch.tensor([0.,0.1]), 'Cx_lef')
+    py_lookup.get_bounds_1d(torch.tensor([0.]), 'CXq')
 
+    CXq = py_lookup.interp_1d(torch.tensor([0.]), 'CXq')
+    Cx_lef = py_lookup.interp_2d(torch.tensor([0.,0.]), 'Cx_lef')
+
+    Cx = py_lookup.interp_3d(torch.tensor([-2.5,0.,0.]), 'Cx')
+    import pdb
+    pdb.set_trace()
