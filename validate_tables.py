@@ -119,5 +119,102 @@ f2c = {value: key for key, value in c2f.items()}
 ########## testing py_tables
 Cx, Cz, Cm, Cy, Cn, Cl = py_lookup.hifi_C()
 
+
+inp = torch.tensor([-2.5, 1.0, 1.0])
+
+
+
+# pass alpha, beta, el
+Cx, Cz, Cm, Cy, Cn, Cl = c_lookup.hifi_C(inp)
+
+# pass alpha
+Cxq, Cyr, Cyp, Czq, Clr, Clp, Cmq, Cnr, Cnp = c_lookup.hifi_damping(inp[0:1])
+
+# pass alpha, beta
+delta_Cx_lef, delta_Cz_lef, delta_Cm_lef, delta_Cy_lef, delta_Cn_lef, \
+    delta_Cl_lef = c_lookup.hifi_C_lef(inp[0:2])
+
+# pass alpha
+delta_Cxq_lef, delta_Cyr_lef, delta_Cyp_lef, delta_Czq_lef, \
+    delta_Clr_lef, delta_Clp_lef, delta_Cmq_lef, delta_Cnr_lef, \
+        delta_Cnp_lef = c_lookup.hifi_damping_lef(inp[0:1])
+
+# pass alpha, beta
+delta_Cy_r30, delta_Cn_r30, delta_Cl_r30 = c_lookup.hifi_rudder(inp[0:2])
+
+# pass alpha, beta
+delta_Cy_a20, delta_Cy_a20_lef, delta_Cn_a20, delta_Cn_a20_lef, \
+    delta_Cl_a20, delta_Cl_a20_lef = c_lookup.hifi_ailerons(inp[0:2])
+
+# pass alpha, el
+delta_Cnbeta, delta_Clbeta, delta_Cm, eta_el, delta_Cm_ds = c_lookup.hifi_other_coeffs(inp[::2])
+
+# hifi_C
+# GOOD
+diff_Cx = py_lookup.interp_3d(inp, 'Cx') - Cx
+diff_Cz = py_lookup.interp_3d(inp, 'Cz') - Cz
+diff_Cm = py_lookup.interp_3d(inp, 'Cm') - Cm
+diff_Cy = py_lookup.interp_2d(inp[0:2], 'Cy') - Cy
+diff_Cn = py_lookup.interp_3d(inp, 'Cn') - Cn
+diff_Cl = py_lookup.interp_3d(inp, 'Cl') - Cl
+
+# hifi_damping
+# GOOD
+diff_Cxq = py_lookup.interp_1d(inp[0:1], 'CXq') - Cxq
+diff_Cyr = py_lookup.interp_1d(inp[0:1], 'CYr') - Cyr
+diff_Cyp = py_lookup.interp_1d(inp[0:1], 'CYp') - Cyp
+diff_Czq = py_lookup.interp_1d(inp[0:1], 'CZq') - Czq
+diff_Clr = py_lookup.interp_1d(inp[0:1], 'CLr') - Clr
+diff_Clp = py_lookup.interp_1d(inp[0:1], 'CLp') - Clp
+diff_Cmq = py_lookup.interp_1d(inp[0:1], 'CMq') - Cmq
+diff_Cnr = py_lookup.interp_1d(inp[0:1], 'CNr') - Cnr
+diff_Cnp = py_lookup.interp_1d(inp[0:1], 'CNp') - Cnp
+
+# hifi_C_lef
+# GOOD
+temp = torch.cat([inp[0:2], torch.tensor([0])])
+diff_delta_Cx_lef = py_lookup.interp_2d(inp[0:2], 'Cx_lef') - py_lookup.interp_3d(temp, 'Cx') - delta_Cx_lef
+diff_delta_Cz_lef = py_lookup.interp_2d(inp[0:2], 'Cz_lef') - py_lookup.interp_3d(temp, 'Cz') - delta_Cz_lef
+diff_delta_Cm_lef = py_lookup.interp_2d(inp[0:2], 'Cm_lef') - py_lookup.interp_3d(temp, 'Cm') - delta_Cm_lef
+diff_delta_Cy_lef = py_lookup.interp_2d(inp[0:2], 'Cy_lef') - py_lookup.interp_2d(inp[0:2], 'Cy') - delta_Cy_lef
+diff_delta_Cn_lef = py_lookup.interp_2d(inp[0:2], 'Cn_lef') - py_lookup.interp_3d(temp, 'Cn') - delta_Cn_lef
+diff_delta_Cl_lef = py_lookup.interp_2d(inp[0:2], 'Cl_lef') - py_lookup.interp_3d(temp, 'Cl') - delta_Cl_lef
+
+# hifi_damping_lef
+# GOOD
+diff_delta_Cxq_lef = py_lookup.interp_1d(inp[0:1], 'delta_CXq_lef') - delta_Cxq_lef
+diff_delta_Cyr_lef = py_lookup.interp_1d(inp[0:1], 'delta_CYr_lef') - delta_Cyr_lef
+diff_delta_Cyp_lef = py_lookup.interp_1d(inp[0:1], 'delta_CYp_lef') - delta_Cyp_lef
+diff_delta_Czq_lef = py_lookup.interp_1d(inp[0:1], 'delta_CZq_lef') - delta_Czq_lef # this being unused is not an error, it is as the original C was written, you can delete if you like.
+diff_delta_Clr_lef = py_lookup.interp_1d(inp[0:1], 'delta_CLr_lef') - delta_Clr_lef
+diff_delta_Clp_lef = py_lookup.interp_1d(inp[0:1], 'delta_CLp_lef') - delta_Clp_lef
+diff_delta_Cmq_lef = py_lookup.interp_1d(inp[0:1], 'delta_CMq_lef') - delta_Cmq_lef
+diff_delta_Cnr_lef = py_lookup.interp_1d(inp[0:1], 'delta_CNr_lef') - delta_Cnr_lef
+diff_delta_Cnp_lef = py_lookup.interp_1d(inp[0:1], 'delta_CNp_lef') - delta_Cnp_lef
+
+# hifi_rudder
+# GOOD
+diff_delta_Cy_r30 = py_lookup.interp_2d(inp[0:2], 'Cy_r30') - py_lookup.interp_2d(inp[0:2], 'Cy') - delta_Cy_r30
+diff_delta_Cn_r30 = py_lookup.interp_2d(inp[0:2], 'Cn_r30') - py_lookup.interp_3d(temp, 'Cn') - delta_Cn_r30
+diff_delta_Cl_r30 = py_lookup.interp_2d(inp[0:2], 'Cl_r30') - py_lookup.interp_3d(temp, 'Cl') - delta_Cl_r30
+
+# hifi_ailerons
+# DISCREPANCIES HERE
+diff_delta_Cy_a20     = py_lookup.interp_2d(inp[0:2], 'Cy_a20') - py_lookup.interp_2d(inp[0:2], 'Cy') - delta_Cy_a20
+diff_delta_Cy_a20_lef = py_lookup.interp_2d(inp[0:2], 'Cy_a20_lef') - py_lookup.interp_2d(inp[0:2], 'Cy_lef') - delta_Cy_a20_lef # discrepancies
+diff_delta_Cn_a20     = py_lookup.interp_2d(inp[0:2], 'Cn_a20') - py_lookup.interp_3d(temp, 'Cn') - delta_Cn_a20
+diff_delta_Cn_a20_lef = py_lookup.interp_2d(inp[0:2], 'Cn_a20_lef') - py_lookup.interp_2d(inp[0:2], 'Cn_lef') - delta_Cn_a20_lef # discrepancies
+diff_delta_Cl_a20     = py_lookup.interp_2d(inp[0:2], 'Cl_a20') - py_lookup.interp_3d(temp, 'Cl') - delta_Cl_a20
+diff_delta_Cl_a20_lef = py_lookup.interp_2d(inp[0:2], 'Cl_a20_lef') - py_lookup.interp_2d(inp[0:2], 'Cl_lef') - delta_Cl_a20_lef # discrepancies
+
+# hifi_other_coeffs
+# GOOD
+diff_delta_Cnbeta = py_lookup.interp_1d(inp[0:1], 'delta_CNbeta') - delta_Cnbeta
+diff_delta_Clbeta = py_lookup.interp_1d(inp[0:1], 'delta_CLbeta') - delta_Clbeta
+diff_delta_Cm = py_lookup.interp_1d(inp[0:1], 'delta_Cm') - delta_Cm
+diff_eta_el = py_lookup.interp_1d(inp[2:3], 'eta_el') - eta_el
+diff_delta_Cm_ds = 0.
+
+
 import pdb
 pdb.set_trace()

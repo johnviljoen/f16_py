@@ -3,7 +3,7 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-from parameters import x0, u0, y0, r0, C, D, dt, SSM, ISM, x_ub, x_lb, u_ub, u_lb, udot_ub, udot_lb
+from parameters import x0, u0, y0, r0, C, D, dt, SSM, ISM, x_ub, x_lb, u_ub, u_lb, udot_ub, udot_lb, ltt
 from tables import c_lookup
 from dynamics import Nlplant
 from control import Linmod, LMPC
@@ -45,7 +45,7 @@ class F16(nn.Module):
         self.n = len(self.x)
 
         # dynamics
-        self.nlplant = Nlplant(device, dtype)
+        self.nlplant = Nlplant(device, dtype, ltt)
 
         # linearisation
         self.linmod = Linmod(
@@ -176,7 +176,7 @@ f16.lmpc.calc_MC()
 ro = f16.lmpc(f16.y, f16.y*1.001)
 
 # instantiation of nlplant
-nlplant = Nlplant(device, dtype)
+nlplant = Nlplant(device, dtype, ltt)
 
 # example call of nlplant to find xdot
 nlplant(f16.x, f16.u)

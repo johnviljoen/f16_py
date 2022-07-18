@@ -229,7 +229,6 @@ class Py_parse():
         line = [float(i) for i in temp]
         return line
 
-
 py_parse = Py_parse()
 
 class Py_lookup():
@@ -392,7 +391,6 @@ class Py_lookup():
         Q10 = self.parse.tables[c2f[coeff]][x1_idx, y0_idx].to(torch.float32)
         Q11 = self.parse.tables[c2f[coeff]][x1_idx, y1_idx].to(torch.float32)
 
-        ### WARNING, this Q01, Q10 ordering is a GUESS its one of two possibilities
         C = 1/((x1 - x0)*(y1 - y0)) * torch.tensor([[x1 - x, x - x0]]) @ torch.tensor([[Q00, Q01],[Q10, Q11]]) @ torch.tensor([[y1 - y],[y - y0]])
 
         return C
@@ -451,6 +449,7 @@ py_lookup = Py_lookup()
 
 
 if __name__ == "__main__":
+    point = torch.tensor([-2.5, 1.0, 1.0])
     py_lookup.get_bounds_3d(torch.tensor([0.,0.1,0.1]), 'Cx')
 
     py_lookup.get_bounds_2d(torch.tensor([0.,0.1]), 'Cx_lef')
@@ -459,6 +458,11 @@ if __name__ == "__main__":
     CXq = py_lookup.interp_1d(torch.tensor([0.]), 'CXq')
     Cx_lef = py_lookup.interp_2d(torch.tensor([0.,0.]), 'Cx_lef')
 
-    Cx = py_lookup.interp_3d(torch.tensor([-2.5,0.,0.]), 'Cx')
+    Cx_py = py_lookup.interp_3d(point, 'Cx')
+
+    Cx, _, _, _, _, _ = c_lookup.hifi_C(point)
+
+    diff_Cx = Cx - Cx_py
+    print(diff_Cx)
     import pdb
     pdb.set_trace()

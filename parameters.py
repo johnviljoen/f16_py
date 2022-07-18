@@ -8,6 +8,7 @@ utterly unmaintainable
 
 # Simulation Parameters
 dt, time_start, time_end = 0.001, 0., 10.
+ltt = 'Py' # lookup table type
 
 # constants
 g = 9.81
