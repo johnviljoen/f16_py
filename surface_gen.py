@@ -57,10 +57,6 @@ for elem in test:
 A = torch.cat(output, axis=1)
 B = Cy.flatten()
 
-#import pdb
-#pdb.set_trace()
-#A = torch.cat(temp_list, axis=1)
-#B = Cy.flatten()
 ####### COMBINATIONS ########
 # cartesian product itertools
 # or combinations
@@ -82,8 +78,6 @@ B = Cy.flatten()
 #import pdb
 #pdb.set_trace()
 
-import ipdb
-ipdb.set_trace()
 
 coeff, r, rank, s = torch.linalg.lstsq(A, B)
 
@@ -94,7 +88,7 @@ Z = (A @ coeff).reshape(X.shape)
 # plot points and fitted surface
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.plot_surface(X, Y, Z, rstride=1, cstride=1, alpha=0.2)
+ax.plot_surface(X, Y, Z, rstride=10, cstride=10, alpha=0.2)
 ax.scatter(X, Y, Cy, c='r', s=10)
 plt.xlabel('alpha')
 plt.ylabel('beta')
