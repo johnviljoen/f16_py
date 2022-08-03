@@ -88,7 +88,7 @@ Z = (A @ coeff).reshape(X.shape)
 # plot points and fitted surface
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.plot_surface(X, Y, Z, rstride=10, cstride=10, alpha=0.2)
+ax.plot_surface(X, Y, Z, rstride=1, cstride=1, alpha=0.2)
 ax.scatter(X, Y, Cy, c='r', s=10)
 plt.xlabel('alpha')
 plt.ylabel('beta')

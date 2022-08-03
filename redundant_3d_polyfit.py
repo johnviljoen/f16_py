@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 
 x = py_lookup.parse.axes['ALPHA1'] # ALPHA1
 y = py_lookup.parse.axes['BETA1'] # BETA1
+z = py_lookup.parse.axes['DH1'] # DH1
 
 # normalise the data
 #norm = max(\
@@ -21,42 +22,45 @@ y = py_lookup.parse.axes['BETA1'] # BETA1
 #x_norm = x/norm
 #y_norm = y/norm 
 
-x_order = 5
-y_order = 5
+x_order = 3
+y_order = 3
+z_order = 2
 
-def f(x, y):
-    return py_lookup.interp_2d(torch.tensor([x, y]), 'Cy')
+def f(x, y, z):
+    return py_lookup.interp_3d(torch.tensor([x, y, z]), 'Cx')
 
-def polyfit2d(f, x, y, x_order, y_order):
+def polyfit3d(f, x, y, z, x_order, y_order, z_order):
 
-    ncols = (x_order+1)*(y_order+1)
+    ncols = (x_order+1)*(y_order+1)*(z_order+1)
     #nrows = max(len(x), len(y))
 
     powers = []
-    ij = itertools.product(range(x_order+1), range(y_order+1))
-    for (i,j) in ij:
-        powers.append((i,j))
+    ijk = itertools.product(range(x_order+1), range(y_order+1), range(z_order+1))
+    for (i,j,k) in ijk:
+        powers.append((i,j,k))
 
  
 
     # form X
     print('forming X...')
-    X = torch.zeros([x.shape[0] * y.shape[0], ncols])
+    X = torch.zeros([x.shape[0] * y.shape[0] * z.shape[0], ncols])
     for col in range(ncols):
-        xy = itertools.product(range(len(x)),range(len(y)))
-        for row, (x_idx,y_idx) in enumerate(xy):
-            X[row,col] = x[x_idx]**powers[col][0] * y[y_idx]**powers[col][1]
+        xyz = itertools.product(range(len(x)),range(len(y)),range(len(z)))
+        for row, (x_idx,y_idx,z_idx) in enumerate(xyz):
+            X[row,col] = \
+                x[x_idx]**powers[col][0] * \
+                y[y_idx]**powers[col][1] * \
+                z[z_idx]**powers[col][2]
 
     # form Y 
     print('forming Y...')
     Y = torch.zeros([X.shape[0],1])
-    xy = itertools.product(range(len(x)),range(len(y)))
-    for row, (x_idx,y_idx) in enumerate(xy):
-        Y[row,:] = f(x[x_idx], y[y_idx])
+    xyz = itertools.product(range(len(x)),range(len(y)),range(len(z)))
+    for row, (x_idx,y_idx,z_idx) in enumerate(xyz):
+        Y[row,:] = f(x[x_idx], y[y_idx], z[z_idx])
 
     # using least squares find the coefficients
     b = torch.linalg.inv(X.T @ X) @ X.T @ Y
-
 
     return b
 
@@ -70,24 +74,28 @@ rows of X for a given point such that we can interrogate the function.
 This will also let us plot it
 """
 
-b = polyfit2d(f, x, y, x_order, y_order)
+b = polyfit3d(f, x, y, z, x_order, y_order, z_order)
 
 # query point
 xp = 90.
 yp = 30.
+zp = 0.
 
 # form the correct powers of this point
-def polyval2d(xp, yp, b, x_order, y_order):
-    ncols = (x_order+1)*(y_order+1)
+def polyval2d(xp, yp, zp, b, x_order, y_order, z_order):
+    ncols = (x_order+1)*(y_order+1)*(z_order+1)
     point = torch.zeros([1,ncols])
-    xy = itertools.product(range(x_order+1),range(y_order+1))
-    for k, (i,j) in enumerate(xy):
-        point[:,k] = xp**i * yp**j
+    xyz = itertools.product(range(x_order+1),range(y_order+1),range(z_order+1))
+    for l, (i,j,k) in enumerate(xyz):
+        point[:,l] = xp**i * yp**j * zp**k
 
     zp = point @ b
     return zp
 
-zp = polyval2d(xp, yp, b, x_order, y_order)
+out_p = polyval2d(xp, yp, zp, b, x_order, y_order, z_order)
+
+import ipdb
+ipdb.set_trace()
 
 """
 Time to plot out in 3D
